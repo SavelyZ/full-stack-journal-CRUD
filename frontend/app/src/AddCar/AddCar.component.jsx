@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function AddCar(){
+
+    // добавить параметр на тип - изменение или добавление, при добавлении откидываем запрос на получение списка доступных товаров для данного магазина  
+
+    const {shop_number} = useParams();
+    const {goods_amount} = useParams();
+    const {goods_price} = useParams();
+    const {goods_number} = useParams();
+
+    console.log(goods_amount, goods_price, goods_number, shop_number);
+
     const [carRecord, setCarRecord] = useState({
         mark:'',
         model: '',

@@ -14,45 +14,43 @@ function Home(){
         .catch(err=>console.log(err))
     },[]);
 
-    const onDeleteClick = (id) => {
-        axios.delete('http://localhost:8081/delete/'+id)
-        .then(res =>{
-         window.location.reload();
-        })
-        .catch(err => console.log(err))
-    }
+    // const onDeleteClick = (id) => {
+    //     axios.delete('http://localhost:8081/delete/'+id)
+    //     .then(res =>{
+    //      window.location.reload();
+    //     })
+    //     .catch(err => console.log(err))
+    // }
 
     return(
-        <div>
+        <div style={{textAlign: "center"}}>
             <table>
                 <thead>
                     <tr>
-                        <th>Марка</th>
-                        <th>Модель</th>
-                        <th>Модность, лс</th>
-                        <th>Год выпуска</th>
-                        <th>Регистрационный номер</th>
+                        <th className="borders">Название</th>
+                        <th className="borders">Адрес</th>
+                        <th className="borders">колличество товара</th>
+                        <th className="borders">Общая цена товара в магазине</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((car, index)=>{
+                    {data.map((shop, index)=>{
                          return <tr key ={index}>
-                                <td>{car.mark}</td>
-                                <td>{car.model}</td>
-                                <td>{car.power}</td>
-                                <td>{car.year}</td>
-                                <td>{car.number}</td>
-                                <td>
+                                <td className="borders">{shop.shop_name}</td>
+                                <td className="borders">{shop.shop_address}</td>
+                                <td className="borders">{shop.total_goods_count}</td>
+                                <td className="borders">{shop.total_goods_price}</td>
+                                <td className="borders">
                                 <div className="buttonContainer">
-                                        <button><Link to={`/card/${car.id}`}>Изменить</Link></button>
-                                        <button onClick={() => onDeleteClick(car.id)}>Удалить</button>
+                                        <button><Link to={`/card/${shop.shop_number}/${shop.shop_name}`}>Изменить наличие товара</Link></button>
+                                        {/* <button onClick={() => onDeleteClick(car.id)}>Удалить</button> */}
                                     </div>
                                 </td>
                          </tr>
                     })}
-                    <tr>
+                    {/* <tr>
                         <button><Link to='/add'>Добавить</Link></button>
-                    </tr>
+                    </tr> */}
                 </tbody>
             </table>
         </div>

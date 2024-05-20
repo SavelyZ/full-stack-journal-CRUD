@@ -1,3 +1,11 @@
 .buttonContainer{
     display: flex;
 }
+
+.tr_table_shops{
+    margin-bottom: 30px;
+  }
+
+  .borders {
+    border: ridge;
+  }
