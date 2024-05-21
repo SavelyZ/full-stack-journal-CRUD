@@ -32,7 +32,7 @@ function CarCard(){
             setData(res.data);
         })
         .catch(err => console.log(err));
-    }, [])
+    }, []);
 
     const navigate = useNavigate();
 
@@ -49,32 +49,32 @@ function CarCard(){
 
     const onDeleteClick = (goods_number) => {
         axios.delete('http://localhost:8081/delete/'+shop_number+'/'+goods_number)
-        .then(res =>{
-        //  window.location.reload();
+        .then(res => {
+            navigate('/');
         })
         .catch(err => console.log(err))
     }
 
     return(
             <div style={{textAlign: "center"}}>
-            {shop_name}
+            <div style={{fontSize: "18px", fontWeight:"700"}}>{shop_name}</div>
             <table>
                 <thead>
                     <tr>
-                        <th>Название</th>
-                        <th>Количество товара</th>
-                        <th>Цена</th>
+                        <th className="borders">Название</th>
+                        <th className="borders">Количество товара</th>
+                        <th className="borders">Цена, шт</th>
                     </tr>
                 </thead>
                 <tbody>
                     {data.map((goods, index)=>{
                          return <tr key ={index}>   
-                                <td>{goods.goods_name}</td>
-                                <td>{goods.goods_amount}</td>
-                                <td>{goods.goods_price}</td>
-                                <td>
+                                <td className="borders">{goods.goods_name}</td>
+                                <td className="borders">{goods.goods_amount}</td>
+                                <td className="borders">{goods.goods_price}</td>
+                                <td className="borders">
                                 <div className="buttonContainer">
-                                <button><Link to={`/add/${shop_number}/${goods.goods_amount}/${goods.goods_price}/${goods.goods_number}`}>Изменить наличие</Link></button>
+                                <button><Link to={`/add/${shop_number}/${goods.goods_amount}/${goods.goods_price}/${goods.goods_number}/1`}>Изменить наличие</Link></button>
                                 <button style={{marginLeft:'10px'}} onClick={() => onDeleteClick(goods.goods_number)}>Удалить наличие</button>
                                         {/* <button><Link to={`/card/${shop.shop_number}`}>Изменить наличие товара</Link></button> */}
                                         {/* <button onClick={() => onDeleteClick(car.id)}>Удалить</button> */}
@@ -82,9 +82,7 @@ function CarCard(){
                                 </td>
                          </tr>
                     })}
-                    {/* <tr>
-                        <button><Link to='/add'>Добавить</Link></button>
-                    </tr> */}
+                     <button><Link to={`/add/${shop_number}/0/0/0/2`}>Добавить наличие</Link></button>
                 </tbody>
             </table>
         </div>

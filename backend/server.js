@@ -73,15 +73,39 @@ app.get('/card/:id', (req, res) => {
     });
 });
 
+// Список доступных товаров
+app.get('/additional-goods/:id', (req, res) => {
+    const id = req.params.id;
+    if (id)
+        console.log('id get - ', id);
+        const sql = `
+        SELECT g.number AS goods_number, g.name AS goods_name
+        FROM Goods g
+        WHERE g.number NOT IN (
+            SELECT ga.number_goods
+            FROM Goods_availability ga
+                WHERE ga.number_shop = ${id}
+        );
+      `;
+    db.query(sql, [id], (err, result) => {
+        if (err)
+            return res.json({ Message: "Error inside server" });
+        return res.json(result);
+    });
+});
+
+// добавить метод на удаление, добавление, изменение наличия  - по аналогии...
+
+
+
 // Добавить ТС
 app.post('/add', (req, res) => {
-    const sql = 'INSERT INTO car (`mark`, `model`, `power`, `year`, `number`) VALUES(?)';
+    const sql = 'INSERT INTO Lab5.Goods_availability (number_shop, number_goods, amount, price) VALUES (?);';
     const values = [
-        req.body.mark,
-        req.body.model,
-        req.body.power,
-        req.body.year,
-        req.body.number,
+        req.body.number_shop,
+        req.body.number_goods,
+        req.body.amount,
+        req.body.price,
     ];
     db.query(sql, [values], (err, result) => {
         if (err)
@@ -90,29 +114,39 @@ app.post('/add', (req, res) => {
     })
 });
 
-//Изменить ТС
-app.post('/update/:id', (req, res) => {
-    const sql = 'UPDATE car SET `mark`=?, `model`=?, `power`=?, `year`=?, `number`=?  WHERE id=?';
+//Изменить наличие
+app.post('/update/:shop_number/:goods_number', (req, res) => {
+    const number_shop = req.params.shop_number;
+    const number_goods = req.params.goods_number;
+    const sql = `
+    UPDATE Lab5.Goods_availability
+    SET amount = ${req.body.amount},
+        price = ${req.body.price}
+    WHERE number_shop = ${number_shop}
+    AND number_goods = ${number_goods};
+    `;
     const id = req.params.id;
-    db.query(sql, [req.body.mark, req.body.model, req.body.power, req.body.year, req.body.number, id], (err, result) => {
+    db.query(sql, [req.body.amount, req.body.price, number_shop, number_goods], (err, result) => {
         if (err)
             return res.json(err);
         return res.json(result);
     })
 });
 
-//Удалить ТС
+//Удалить наличие товара
 
 app.delete('/delete/:shop_number/:goods_number', (req, res) => {
-    const sql = 'DELETE FROM car WHERE id=?';
     const shop_number = req.params.shop_number;
     const goods_number = req.params.goods_number;
-    // удаление записи
-    // db.query(sql, [id], (err, result) => {
-    //     if (err)
-    //         return res.json(err);
-    //     return res.json(result);
-    // })
+    const sql = `
+    DELETE FROM Lab5.Goods_availability
+        WHERE number_shop = ${shop_number}
+        AND number_goods = ${goods_number};`;
+    db.query(sql, [shop_number, goods_number], (err, result) => {
+        if (err)
+            return res.json(err);
+        return res.json(result);
+    })
 })
 
 // Добавить метод на получение списка доступных товаров для данного магазина
