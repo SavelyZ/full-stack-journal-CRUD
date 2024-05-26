@@ -5,25 +5,35 @@ import { Link } from "react-router-dom";
 
 function Home(){
     const [data, setData] = useState([]);
+    const [valueSearch, setValueSearch] = useState('');
+    const [dataSeacrhed, setDataSearched] = useState([])
+
     useEffect(()=>{
         axios.get('http://localhost:8081/get')
         .then(res=>{
             console.log(res.data)
             setData(res.data);
+            setDataSearched(res.data);
         })
         .catch(err=>console.log(err))
     },[]);
 
-    // const onDeleteClick = (id) => {
-    //     axios.delete('http://localhost:8081/delete/'+id)
-    //     .then(res =>{
-    //      window.location.reload();
-    //     })
-    //     .catch(err => console.log(err))
-    // }
+    const doSearch = () => {
+        console.log(valueSearch);
+        if(valueSearch !== ''){
+            setDataSearched(data.filter((e)=>e.shop_name.toLowerCase().includes(valueSearch.toLowerCase())))
+            setValueSearch('');
+        }
+    }
 
     return(
-        <div style={{textAlign: "center"}}>
+        <div style={{textAlign: "center", maxWidth:'750px'}}>
+            <div className="borders" style={{display:'flex', width:'93.5%', marginTop:'10px', marginBottom: '10px', alignItems:'left', padding:'20px'}}>
+                <label style={{width:'220px', marginRight:'10px'}}>Поиск по названию магазина</label>
+                <input type="text" value={valueSearch} style={{marginRight:'10px', width:'50%'}} onChange={e => setValueSearch(e.target.value)}/>
+                <button onClick={doSearch}>Искать</button>
+                <button onClick={() => setDataSearched(data)} style={{marginLeft: '10px'}}>Все</button>
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -34,7 +44,7 @@ function Home(){
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((shop, index)=>{
+                    {dataSeacrhed.map((shop, index)=>{
                          return <tr key ={index}>
                                 <td className="borders">{shop.shop_name}</td>
                                 <td className="borders">{shop.shop_address}</td>
