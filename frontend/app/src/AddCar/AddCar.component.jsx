@@ -23,12 +23,20 @@ function AddCar(){
         addGood: {}
     })
 
+    const [changePrice, setChangePrice] = useState(0);
 
     const navigate = useNavigate();
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if(typePage === '1')
+        if(changePrice !== 0){
+            axios.post('http://localhost:8081/update-price-shop/'+shop_number+'/'+goods_number +'/'+changePrice)
+            .then(res => {
+            navigate('/');
+        })
+        .catch(err => console.log(err))
+        }else{
+            if(typePage === '1')
         {
             //изменить
             axios.post('http://localhost:8081/update/'+shop_number+'/'+goods_number, { 
@@ -54,6 +62,7 @@ function AddCar(){
             })
             .catch(err => console.log(err))
         }
+        }
     }
 
     useEffect(() => {
@@ -67,11 +76,14 @@ function AddCar(){
         }
     }, []);
 
+
     return(
         <form onSubmit={onSubmit}>
            {typePage === '1' && <>
-            <div style={{fontWeight: "700", marginLeft:"30px"}}>
-                Изменение наличия
+           <div style={{display:'flex'}}>
+           <div>
+            <div style={{fontWeight: "700", marginLeft:"30px", textAlign:'center'}}>
+                Изменение наличия и цены
             </div>
             <div className="container" style={{marginTop:"10px"}}>
                 <label>Количество</label>
@@ -82,7 +94,17 @@ function AddCar(){
                 <input type="number" value={carRecord.goods_price} onChange={e => setCarRecord({...carRecord, goods_price: e.target.value})}></input>
             </div>
             <button type="submit" style={{marginTop:"10px", marginLeft:"30px"}}>Изменить</button>
-           </>}
+            </div>
+           <div style={{marginTop:'40px', marginLeft:'50px'}}>
+                    <div className="borders" style={{width: '430px', justifyContent:'space-between', display:'flex', padding:'5px'}}>
+                        <label>Изменить цену, %</label>
+                        <input type="number" value={changePrice} onChange={(e)=>setChangePrice(e.target.value)} />
+                        <button type="submit"> Изменить</button>
+                    </div>
+            </div>
+           </div>
+           </>
+           }
            {typePage === '2' && <>
            <div style={{fontWeight: "700", marginLeft:"30px"}}>
                 Добавить наличие

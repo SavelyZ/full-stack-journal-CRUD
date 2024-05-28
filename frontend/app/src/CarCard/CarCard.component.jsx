@@ -24,6 +24,8 @@ function CarCard(){
         goods_number:0,
     }]);
 
+    const [changePrice, setChangePrice] = useState(0);
+
     useEffect(() => {
         console.log('id - ',shop_number)
         axios.get('http://localhost:8081/card/'+shop_number)
@@ -55,9 +57,18 @@ function CarCard(){
         .catch(err => console.log(err))
     }
 
+    const ChangePrices = () =>{
+            axios.post('http://localhost:8081/update-price-shop-all/'+shop_number+'/'+changePrice)
+            .then(res => {
+               // navigate('/');
+            })
+            .catch(err => console.log(err))
+    }
+
     return(
             <div style={{textAlign: "center"}}>
             <div style={{fontSize: "18px", fontWeight:"700"}}>{shop_name}</div>
+            <div style={{display:'flex'}}>
             <table>
                 <thead>
                     <tr>
@@ -74,7 +85,7 @@ function CarCard(){
                                 <td className="borders">{goods.goods_price}</td>
                                 <td className="borders">
                                 <div className="buttonContainer">
-                                <button><Link to={`/add/${shop_number}/${goods.goods_amount}/${goods.goods_price}/${goods.goods_number}/1`}>Изменить наличие</Link></button>
+                                <button><Link to={`/add/${shop_number}/${goods.goods_amount}/${goods.goods_price}/${goods.goods_number}/1`}>Изменить наличие и цену</Link></button>
                                 <button style={{marginLeft:'10px'}} onClick={() => onDeleteClick(goods.goods_number)}>Удалить наличие</button>
                                         {/* <button><Link to={`/card/${shop.shop_number}`}>Изменить наличие товара</Link></button> */}
                                         {/* <button onClick={() => onDeleteClick(car.id)}>Удалить</button> */}
@@ -82,9 +93,19 @@ function CarCard(){
                                 </td>
                          </tr>
                     })}
-                     <button><Link to={`/add/${shop_number}/0/0/0/2`}>Добавить наличие</Link></button>
+                     <button style={{marginTop:'10px'}}><Link to={`/add/${shop_number}/0/0/0/2`}>Добавить наличие</Link></button>
                 </tbody>
-            </table>
+            </table>    
+            <div style={{marginTop:'40px', marginLeft:'50px'}}>
+            <form onSubmit={ChangePrices}>
+                    <div className="borders" style={{width: '430px', justifyContent:'space-between', display:'flex', padding:'5px'}}>
+                        <label>Изменить все цены, %</label>
+                        <input type="number" value={changePrice} onChange={(e)=>setChangePrice(e.target.value)} />
+                        <button type="submit"> Изменить</button>
+                    </div>
+                </form>
+            </div>
+            </div>
         </div>
     );
 }

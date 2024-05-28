@@ -58,11 +58,12 @@ function Home(){
                                 </td>
                          </tr>
                     })}
-                    {/* <tr>
-                        <button><Link to='/add'>Добавить</Link></button>
-                    </tr> */}
                 </tbody>
             </table>
+            <div style={{display: 'flex', marginTop:'10px'}}>
+                            <button><Link to='/report/1'>Отчет по Магазинам</Link></button>
+                            <button style={{marginLeft:'10px'}}><Link to='/report/2'>Отчет по товарам</Link></button>
+            </div>
         </div>
     )
 }

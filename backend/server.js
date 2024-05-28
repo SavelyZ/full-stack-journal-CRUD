@@ -94,9 +94,59 @@ app.get('/additional-goods/:id', (req, res) => {
     });
 });
 
-// добавить метод на удаление, добавление, изменение наличия  - по аналогии...
+// список для отчета 1
+app.get('/otchet-all-info-1', (req, res) => {
+    const sql = `
+        SELECT s.name AS shop_name, g.name AS goods_name, ga.amount, ga.price
+        FROM Shops s
+        JOIN Goods_availability ga ON s.number = ga.number_shop
+        JOIN Goods g ON ga.number_goods = g.number
+        ORDER BY s.name, ga.price;
+    `;
+    db.query(sql, (err, result) => {
+        if (err)
+            return res.json({ Message: "Error inside server" });
+        return res.json(result);
+    });
+});
 
+// инфо по магазинам
+app.get('/otchet-shop-info-1', (req, res) => {
+    const sql = `
+        SELECT s.*, SUM(ga.amount) AS total_goods_amount
+        FROM Shops s
+        JOIN Goods_availability ga ON s.number = ga.number_shop
+        GROUP BY s.number
+        ORDER BY s.name;
+    `;
+    db.query(sql, (err, result) => {
+        if (err)
+            return res.json({ Message: "Error inside server" });
+        return res.json(result);
+    });
+});
 
+//список для отчета 2
+app.get('/otchet-all-info-2', (req, res) => {
+    let sql = `
+    SELECT s.name AS shop_name,
+    MAX(CASE WHEN g.name = 'potate' THEN ga.amount ELSE 0 END) AS potate,
+    MAX(CASE WHEN g.name = 'juice' THEN ga.amount ELSE 0 END) AS juice,
+    MAX(CASE WHEN g.name = 'chocolate bar' THEN ga.amount ELSE 0 END) AS chocolate,
+    MAX(CASE WHEN g.name = 'milk' THEN ga.amount ELSE 0 END) AS milk
+    FROM Shops s
+    CROSS JOIN Goods g
+    LEFT JOIN Goods_availability ga ON s.number = ga.number_shop AND g.number = ga.number_goods
+    GROUP BY s.name
+    ORDER BY s.name;
+    `;
+
+    db.query(sql, (err, result) => {
+        if (err)
+            return res.json({ Message: "Error inside server" });
+        return res.json(result);
+    });
+});
 
 // Добавить ТС
 app.post('/add', (req, res) => {
@@ -127,6 +177,50 @@ app.post('/update/:shop_number/:goods_number', (req, res) => {
     `;
     const id = req.params.id;
     db.query(sql, [req.body.amount, req.body.price, number_shop, number_goods], (err, result) => {
+        if (err)
+            return res.json(err);
+        return res.json(result);
+    })
+});
+
+// Изменить все цены в магазине
+app.post('/update-price-shop-all/:shop_number/:change_price', (req, res) => {
+    const shopNumber  = req.params.shop_number;
+    const percentChange  = req.params.change_price;
+    const sql = `
+    UPDATE goods_availability
+    SET price = 
+      CASE
+        WHEN ${percentChange} < 0 THEN price * (1 + (${percentChange}/100))
+        WHEN ${percentChange} = 0 THEN price
+        ELSE price * (1 + (${percentChange}/100))
+      END
+    WHERE number_shop = ${shopNumber}
+    `;
+    db.query(sql, [shopNumber, percentChange], (err, result) => {
+        if (err)
+            return res.json(err);
+        return res.json(result);
+    })
+});
+
+// изменить цену товара в магазине 
+app.post('/update-price-shop/:shop_number/:goods_number/:change_price', (req, res) => {
+    const shopNumber  = req.params.shop_number;
+    const productId = req.params.goods_number; 
+    const percentChange  = req.params.change_price;
+    console.log(shopNumber, productId, percentChange);
+    const sql = `
+    UPDATE goods_availability
+    SET price = 
+      CASE
+        WHEN ${percentChange} < 0 THEN price * (1 + (${percentChange}/100))
+        WHEN ${percentChange} = 0 THEN price
+        ELSE price * (1 + (${percentChange}/100))
+      END
+    WHERE number_shop = ${shopNumber} AND number_goods = ${productId};
+    `;
+    db.query(sql, [shopNumber, productId, percentChange], (err, result) => {
         if (err)
             return res.json(err);
         return res.json(result);
